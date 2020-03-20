@@ -6,8 +6,10 @@ DB_PATH = ROOT_PATH / 'db.json'
 REQUEST_FOLDER = ROOT_PATH / 'requests'
 BOOKING_FOLDER = ROOT_PATH / 'booking'
 
-GOALS = {"travel": "Для путешествий", "study": "Для учебы",
-         "work": "Для работы", "relocate": "Для переезда"}
+GOALS = {'travel': 'Для путешествий', 'study': 'Для учебы',
+         'work': 'Для работы', 'relocate': 'Для переезда',
+         'development': 'Для программирования',
+         }
 
 DAY_MAPPING = {
     'mon': 'Понедельник',

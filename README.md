@@ -11,7 +11,7 @@
 #### Running
 For running type:
 ```shell script
-python app.py --host 0:0:0:0 --port 8080
+python app.py --host 0.0.0.0 --port 8080
 ```
 To see all keys for running, type:
 ```shell script

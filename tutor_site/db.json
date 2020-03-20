@@ -679,7 +679,8 @@
         "price": 1700,
         "goals": [
             "relocate",
-            "work"
+            "work",
+            "development"
         ],
         "free": {
             "mon": {
@@ -762,7 +763,8 @@
         "picture": "https://i.pravatar.cc/300?img=36",
         "price": 1200,
         "goals": [
-            "work"
+            "work",
+            "development"
         ],
         "free": {
             "mon": {
@@ -931,7 +933,8 @@
         "price": 900,
         "goals": [
             "travel",
-            "work"
+            "work",
+            "development"
         ],
         "free": {
             "mon": {

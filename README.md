@@ -1,3 +1,7 @@
+#### Description
+This project is a second task of the online [course](https://academy.stepik.org/flask)
+
+
 #### Install
 1. Create virtualenv and activate it:
     ```shell script

@@ -1,4 +1,5 @@
 import json
+import random
 from typing import Dict, List, Optional, Union
 
 from flask import Flask, abort, render_template, redirect, request
@@ -75,9 +76,9 @@ class TutorSiteApp:
                                self._get_booking_done, methods=['POST'])
 
     def _get_index(self) -> str:
-        data = sorted(self.data.items(),
-                      key=lambda item: item[1]['rating'],
-                      reverse=True)[0:6]
+        profile_ids = random.sample(list(self.data), 6)
+        data = {profile_id: self.data[profile_id]
+                for profile_id in profile_ids}
 
         return render_template('index.html', data=dict(data), goals=cfg.GOALS)
 
@@ -88,8 +89,12 @@ class TutorSiteApp:
         data = {id_: tutor
                 for id_, tutor in self.data.items()
                 if goal in tutor['goals']}
+        data = sorted(data.items(),
+                      key=lambda item: item[1]['rating'],
+                      reverse=True)
 
-        return render_template('goal.html', data=data, goal=cfg.GOALS[goal])
+        return render_template('goal.html', data=dict(data),
+                               goal=cfg.GOALS[goal])
 
     def _get_profile(self, profile_id: str) -> str:
         profile_id = str(profile_id)

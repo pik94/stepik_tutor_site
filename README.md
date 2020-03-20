@@ -13,6 +13,11 @@ This project is a second task of the online [course](https://academy.stepik.org/
    ```
 
 #### Running
+Initialize data:
+```shell script
+python init_db.py
+```
+
 For running type:
 ```shell script
 python app.py --host 0.0.0.0 --port 8080

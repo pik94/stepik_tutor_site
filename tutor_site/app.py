@@ -1,7 +1,8 @@
 import json
 import random
-from typing import Dict, List, Optional, Union
+from typing import Dict, Optional, Union
 
+import waitress
 from flask import Flask, abort, render_template, redirect, request
 
 from tutor_site import config as cfg
@@ -188,9 +189,12 @@ class TutorSiteApp:
                                client_phone=client_phone)
 
     def run(self,
-            debug: Optional[bool] = False,
             host: Optional[str] = 'localhost',
-            port: Optional[int] = 8080):
+            port: Optional[int] = 8080,
+            debug: Optional[bool] = False,):
         self.set_pages()
 
-        self._app.run(debug=debug, host=host, port=port)
+        if debug:
+            self._app.run(debug=debug, host=host, port=port)
+        else:
+            waitress.serve(self.server, host=host, port=port)

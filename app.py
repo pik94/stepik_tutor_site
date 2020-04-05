@@ -1,19 +1,18 @@
 import argparse
+import waitress
 
 from tutor_site import app
 
 
 def main(args: argparse.Namespace):
     debug = args.debug
-    if debug not in [0, 1]:
-        raise ValueError((f'Unknown a debug mode. A value should be 0 or 1, '
-                          f'but {debug} was given.'))
-
-    debug = bool(debug)
 
     host = args.host
     port = args.port
-    app.run(host=host, port=port, debug=debug)
+    if debug:
+        app.run(host=host, port=port, debug=debug)
+    else:
+        waitress.serve(app, host=host, port=port)
 
 
 if __name__ == '__main__':

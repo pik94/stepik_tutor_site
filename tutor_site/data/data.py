@@ -24,7 +24,7 @@ class Data:
     def data(self) -> Dict[str, Dict[str, Union[int, str]]]:
         if self._data is None:
             if not cfg.DB_PATH.exists():
-                raise ValueError('Cannot initialize database.')
+                raise ValueError('Database has not been initialized.')
 
             with open(cfg.DB_PATH, 'r') as file:
                 self._data = json.load(file)

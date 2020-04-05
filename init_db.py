@@ -1,7 +1,7 @@
 import json
 
 from tutor_site.config import DB_PATH
-from tutor_site.data import teachers
+from tutor_site.data.raw_data import teachers
 
 
 def main() -> None:

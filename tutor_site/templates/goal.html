@@ -6,14 +6,10 @@
     <div class="row">
     <div class="col-12 col-lg-10 offset-lg-1 m-auto">
       {%- for id_, teacher in data.items() %}
-        {% include 'description.html' %}
+        {% include 'teacher_description.html' %}
       {%- endfor %}
     </div>
   </div>
 
-  <h2 class="text-center mt-5 mb-3">Не нашли своего репетитора?</h2>
-  <p class="text-center mb-4">Расскажите, кто вам нужен и мы подберем его сами</p>
-  <div class="text-center pb-5">
-      <a href="request.html" class="btn btn-primary">Заказать подбор</a>
-  </div>
+  {% include 'request_help.html' %}
 {% endblock %}

@@ -1,6 +1,7 @@
 #### Description
-This project is a second task of the online [course](https://academy.stepik.org/flask)
-
+This project is the third task of an online [course](https://academy.stepik.org/flask)
+It's a simple web site that helps to look for a English language tutor in 
+according to your demands, book classes or send a request to help in searching.
 
 #### Install
 1. Create virtualenv and activate it:

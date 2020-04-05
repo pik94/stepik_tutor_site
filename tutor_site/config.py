@@ -2,9 +2,9 @@ from pathlib import Path
 
 ROOT_PATH = Path(__file__).parent
 
-DB_PATH = ROOT_PATH / 'db.json'
-REQUEST_FOLDER = ROOT_PATH / 'requests'
-BOOKING_FOLDER = ROOT_PATH / 'booking'
+DB_PATH = ROOT_PATH / 'storage/db.json'
+REQUEST_FOLDER = ROOT_PATH / 'storage'
+BOOKING_FOLDER = ROOT_PATH / 'storage'
 
 GOALS = {'travel': 'Для путешествий', 'study': 'Для учебы',
          'work': 'Для работы', 'relocate': 'Для переезда',

@@ -21,11 +21,12 @@ if __name__ == '__main__':
     parser.add_argument('-d',
                         '--debug',
                         required=False,
-                        type=int,
-                        default=0,
-                        help=('Set a debug mode. 0 and 1 are available for '
-                              'setting. If 1 is set, the application will use '
-                              'waitress as a WSGI server'))
+                        action='store_true',
+                        default=False,
+                        help=('If it is not set, the application will use '
+                              'waitress as a WSGI server. Otherwise, it will '
+                              'be run on default Flask server in a debug '
+                              'mode'))
 
     parser.add_argument('-ho',
                         '--host',

@@ -3,6 +3,7 @@
 {% block container %}
   <div class="col-12 col-sm-10 col-lg-6 offset-lg-3 offset-sm-1">
     <form action="{{ url_for('request_done') }}" class="card mb-5" method="post">
+      {{ form.csrf_token }}
       <div class="card-body text-center pt-5">
         <h1 class="h3 card-title mt-4 mb-2">Подбор преподавателя</h1>
         <p class="px-5">Напишите, чего вам нужно, и&nbsp;мы&nbsp;подберем отличных&nbsp;ребят</p>
@@ -11,19 +12,35 @@
         <div class="row">
           <div class="col">
             {{ form.goal.label(class="form-check-label", text='Какая цель занятий?') }}
-            {{ form.goal(class="form-check-input") }}
+            {% for goal in form.goal %}
+              <div class="form-check">
+                {{ goal(class="form-check-input") }}
+                {{ goal.label(class="form-check-label") }}
+              </div>
+            {% endfor %}
           </div>
           <div class="col">
-            {{ form.time.label(class="form-check-label", text='Какая цель занятий?') }}
-            {{ form.time(class="form-check-input") }}
+            {{ form.time.label(class="form-check-label", text='Сколько времени есть для занятий?') }}
+            {% for time in form.time %}
+              <div class="form-check">
+                {{ time(class_="form-check-input") }}
+                {{ time.label(class="form-check-label") }}
+              </div>
+            {% endfor %}
           </div>
         </div>
       </div>
       <hr>
       <div class="card-body mx-3">
+        {% for err in form.name.errors %}
+          <p class="error">{{ err }}</p>
+        {% endfor %}
         {{ form.name.label(class="mb-1 mt-2") }}
         {{ form.name(class="form-control", placeholder="Введите Ваше имя") }}
 
+        {% for err in form.phone.errors %}
+          <p class="error">{{ err }}</p>
+        {% endfor %}
         {{ form.phone.label(class="mb-1 mt-2") }}
         {{ form.phone(class="form-control", placeholder="Введите Ваш номер") }}
 

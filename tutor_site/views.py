@@ -60,7 +60,6 @@ class RequestPage(BasePage):
     def dispatch_request(self) -> str:
         form = RequestForm()
         return render_template(self._template_name, form=form)
-        # return render_template(self._template_name, goals=cfg.GOALS)
 
 
 class RequestDonePage(BasePage):
@@ -73,6 +72,9 @@ class RequestDonePage(BasePage):
         time = form.time.data
         name = form.name.data
         phone = form.phone.data
+
+        if not form.validate_on_submit():
+            return render_template('request.html', form=form)
 
         req = Request(name=name, phone=phone, time=time, goal=goal)
         db_model.session.add(req)
@@ -117,11 +119,13 @@ class BookingDonePage(BasePage):
         client_name = form.name.data
         client_phone = form.phone.data
 
-        # day_ticker = request.form.get('clientWeekday', '')
-        # time = request.form.get('clientTime', '')
-        # profile_id = request.form.get('clientTeacher', 0)
-        # client_name = request.form.get('clientName', '')
-        # client_phone = request.form.get('clientPhone', '')
+        if not form.validate_on_submit():
+            return render_template('booking.html',
+                                   tutor=tutor_id,
+                                   day_ticker=day_ticker,
+                                   day=cfg.DAY_MAPPING[day_ticker],
+                                   time=time,
+                                   form=form)
 
         booking_info = Booking(time=dt.datetime.strptime(time, '%H:%M').time(),
                                day_ticker=day_ticker,

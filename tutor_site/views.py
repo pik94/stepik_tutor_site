@@ -57,88 +57,75 @@ class ProfilePage(BasePage):
 
 
 class RequestPage(BasePage):
-    def dispatch_request(self) -> str:
-        form = RequestForm()
-        return render_template(self._template_name, form=form)
-
-
-class RequestDonePage(BasePage):
-    methods = ['POST']
+    methods = ['GET', 'POST']
 
     def dispatch_request(self) -> str:
         form = RequestForm()
+        if request.method == 'GET' or not form.validate_on_submit():
+            return render_template(self._template_name, form=form)
 
-        goal = form.goal.data
-        time = form.time.data
-        name = form.name.data
-        phone = form.phone.data
+        elif request.method == 'POST':
+            goal = form.goal.data
+            time = form.time.data
+            name = form.name.data
+            phone = form.phone.data
 
-        if not form.validate_on_submit():
-            return render_template('request.html', form=form)
+            req = Request(name=name, phone=phone, time=time, goal=goal)
+            db_model.session.add(req)
+            # TODO: handle exception
+            db_model.session.commit()
 
-        req = Request(name=name, phone=phone, time=time, goal=goal)
-        db_model.session.add(req)
-        # TODO: handle exception
-        db_model.session.commit()
+            goal = cfg.GOALS.get(goal, '')
 
-        goal = cfg.GOALS.get(goal, '')
+            return render_template('request_done.html',
+                                   goal=goal,
+                                   time=time,
+                                   name=name,
+                                   phone=phone)
 
-        return render_template('request_done.html',
-                               goal=goal,
-                               time=time,
-                               name=name,
-                               phone=phone)
+        else:
+            abort(404)
 
 
 class BookingPage(BasePage):
+    methods = ['GET', 'POST']
+
     def dispatch_request(self, profile_id: int, day: str, time: str) -> str:
-        tutor = db_model.session.query(Tutor).filter(
-            Tutor.id == profile_id).scalar()
-        if not tutor:
-            abort(404)
-
-        booking_form = BookingForm()
-
-        return render_template(self._template_name,
-                               tutor=tutor,
-                               day_ticker=day,
-                               day=cfg.DAY_MAPPING[day],
-                               time=time,
-                               form=booking_form)
-
-
-class BookingDonePage(BasePage):
-    methods = ['POST']
-
-    def dispatch_request(self) -> str:
         form = BookingForm()
+        if request.method == 'GET' or not form.validate_on_submit():
+            tutor = db_model.session.query(Tutor).filter(
+                Tutor.id == profile_id).scalar()
+            if not tutor:
+                abort(404)
 
-        day_ticker = form.day_ticker.data
-        time = form.time.data
-        tutor_id = form.tutor_id.data
-        client_name = form.name.data
-        client_phone = form.phone.data
-
-        if not form.validate_on_submit():
-            return render_template('booking.html',
-                                   tutor=tutor_id,
-                                   day_ticker=day_ticker,
-                                   day=cfg.DAY_MAPPING[day_ticker],
+            return render_template(self._template_name,
+                                   tutor=tutor,
+                                   day_ticker=day,
+                                   day=cfg.DAY_MAPPING[day],
                                    time=time,
                                    form=form)
 
-        booking_info = Booking(time=dt.datetime.strptime(time, '%H:%M').time(),
-                               day_ticker=day_ticker,
-                               client_name=client_name,
-                               client_phone=client_phone,
-                               tutor_id=int(tutor_id))
+        elif request.method == 'POST':
 
-        # TODO: handle exception
-        db_model.session.add(booking_info)
-        db_model.session.commit()
+            day = form.day_ticker.data
+            time = form.time.data
+            tutor_id = form.tutor_id.data
+            client_name = form.name.data
+            client_phone = form.phone.data
 
-        return render_template(self._template_name,
-                               day=cfg.DAY_MAPPING[day_ticker],
-                               time=time,
-                               client_name=client_name,
-                               client_phone=client_phone)
+            booking_info = Booking(
+                time=dt.datetime.strptime(time, '%H:%M').time(),
+                day_ticker=day,
+                client_name=client_name,
+                client_phone=client_phone,
+                tutor_id=int(tutor_id))
+
+            # TODO: handle exception
+            db_model.session.add(booking_info)
+            db_model.session.commit()
+
+            return render_template('booking_done.html',
+                                   day=cfg.DAY_MAPPING[day],
+                                   time=time,
+                                   client_name=client_name,
+                                   client_phone=client_phone)

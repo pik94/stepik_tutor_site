@@ -3,8 +3,7 @@ from flask_migrate import Migrate
 
 from tutor_site import config as cfg
 from tutor_site.views import (
-    BookingPage, BookingDonePage, GoalPage, IndexPage, ProfilePage,
-    RequestPage, RequestDonePage
+    BookingPage, GoalPage, IndexPage, ProfilePage, RequestPage
     )
 from tutor_site.database import db_model
 from tutor_site.database.database import get_connection_string
@@ -41,17 +40,7 @@ app.add_url_rule('/profiles/<int:profile_id>', view_func=_profile_view)
 _request_view = RequestPage.as_view('request', template_name='request.html')
 app.add_url_rule('/request', view_func=_request_view)
 
-# request done page
-_request_done_view = RequestDonePage.as_view('request_done',
-                                             template_name='request_done.html')
-app.add_url_rule('/request_done', view_func=_request_done_view)
-
 # booking page
 _booking_view = BookingPage.as_view('booking', template_name='booking.html')
 app.add_url_rule('/booking/<int:profile_id>/<string:day>/<string:time>',
                  view_func=_booking_view)
-
-# booking done page
-_booking_done_view = BookingDonePage.as_view('booking_done',
-                                             template_name='booking_done.html')
-app.add_url_rule('/booking_done', view_func=_booking_done_view)

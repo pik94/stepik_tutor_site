@@ -10,22 +10,24 @@
           <p class="my-1">Запись на пробный урок</p>
           <p class="my-1">{{ day }}, {{ time }}</p>
         </div>
-        <hr />
+        <hr/>
         <div class="card-body mx-3">
-            <div class="row">
-                <input class="form-control" type="hidden" name="clientWeekday" value="{{ day_ticker }}">
-                <input class="form-control" type="hidden" name="clientTime" value="{{ time }}">
-                <input class="form-control" type="hidden" name="clientTeacher" value="{{ tutor.id }}">
-            </div>
+          <div class="row">
+<!--                <input class="form-control" type="hidden" name="clientWeekday" value="{{ day_ticker }}">-->
+<!--                <input class="form-control" type="hidden" name="clientTime" value="{{ time }}">-->
+<!--                <input class="form-control" type="hidden" name="clientTeacher" value="{{ tutor.id }}">-->
+            {{ form.day_ticker(class="form-control", value=day_ticker) }}
+            {{ form.time(class="form-control", value=time) }}
+            {{ form.tutor_id(class="form-control", value=tutor.id) }}
+          </div>
 
-          <label class="mb-1 mt-2" for="clientName">Вас зовут</label>
-          <input class="form-control" type="text" name="clientName" id="clientName">
+          {{ form.name.label(class="mb-1 mt-2", text="Вас зовут") }}
+          {{ form.name(class="form-control", placeholder="Ваше имя") }}
 
-          <label class="mb-1 mt-2" for="clientPhone">Ваш телефон</label>
-          <input class="form-control" type="tel"  name="clientPhone" id="clientPhone">
+          {{ form.phone.label(class="mb-1 mt-2", text="Ваш телефон") }}
+          {{ form.phone(class="form-control", placeholder="Ваше телефон") }}
 
-          <input type="submit" class="btn btn-primary btn-block mt-4" value="Записаться на пробный урок">
-
+          {{ form.submit(class="btn btn-primary btn-block mt-4") }}
         </div>
       </form>
     </div>

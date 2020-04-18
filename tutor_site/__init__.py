@@ -1,20 +1,23 @@
 from flask import Flask
 from flask_migrate import Migrate
 
+from tutor_site import config as cfg
 from tutor_site.views import (
     BookingPage, BookingDonePage, GoalPage, IndexPage, ProfilePage,
     RequestPage, RequestDonePage
     )
 from tutor_site.database import db_model
+from tutor_site.database.database import get_connection_string
 
 app = Flask(__name__, template_folder='templates')
 app.url_map.strict_slashes = False
 app.jinja_env.filters['any'] = any
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://pik:123@localhost:5432/tutordb'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/tutordb'
+app.config['SQLALCHEMY_DATABASE_URI'] = get_connection_string()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.secret_key = cfg.CSRF_TOKEN
 
 db_model.init_app(app)
+app.app_context().push()
 
 migrate = Migrate(app, db_model)
 

@@ -37,7 +37,7 @@ class Booking(db.Model):
     __tablename__ = 'booking'
 
     id = db.Column(db.Integer, primary_key=True)
-    time = db.Column(db.TIME, nullable=False)
+    time = db.Column(db.Time, nullable=False)
     day_ticker = db.Column(db.String(3), nullable=False)
     client_name = db.Column(db.Text, nullable=False)
     client_phone = db.Column(db.Text, nullable=False)

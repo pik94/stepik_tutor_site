@@ -6,6 +6,7 @@ from flask.views import View
 from tutor_site import config as cfg
 from tutor_site.database import db_model
 from tutor_site.database import Booking, Goal, Request, Tutor
+from tutor_site.forms import BookingForm, RequestForm
 
 
 class BasePage(View):
@@ -37,7 +38,7 @@ class GoalPage(BasePage):
 
         tutors = sorted(goal_obj.tutors, key=lambda tutor: tutor.rating,
                         reverse=True)
-        data = {id_: tutor for id_, tutor in tutors}
+        data = {tutor.id: tutor for tutor in tutors}
         return render_template(self._template_name, data=dict(data),
                                goal=cfg.GOALS[goal])
 
@@ -57,17 +58,21 @@ class ProfilePage(BasePage):
 
 class RequestPage(BasePage):
     def dispatch_request(self) -> str:
-        return render_template(self._template_name, goals=cfg.GOALS)
+        form = RequestForm()
+        return render_template(self._template_name, form=form)
+        # return render_template(self._template_name, goals=cfg.GOALS)
 
 
 class RequestDonePage(BasePage):
     methods = ['POST']
 
     def dispatch_request(self) -> str:
-        goal = request.form.get('goal', '')
-        time = request.form.get('time', '')
-        name = request.form.get('name', '')
-        phone = request.form.get('phone', '')
+        form = RequestForm()
+
+        goal = form.goal.data
+        time = form.time.data
+        name = form.name.data
+        phone = form.phone.data
 
         req = Request(name=name, phone=phone, time=time, goal=goal)
         db_model.session.add(req)
@@ -90,28 +95,39 @@ class BookingPage(BasePage):
         if not tutor:
             abort(404)
 
+        booking_form = BookingForm()
+
         return render_template(self._template_name,
                                tutor=tutor,
                                day_ticker=day,
                                day=cfg.DAY_MAPPING[day],
-                               time=time)
+                               time=time,
+                               form=booking_form)
 
 
 class BookingDonePage(BasePage):
     methods = ['POST']
 
     def dispatch_request(self) -> str:
-        day_ticker = request.form.get('clientWeekday', '')
-        time = request.form.get('clientTime', '')
-        profile_id = request.form.get('clientTeacher', 0)
-        client_name = request.form.get('clientName', '')
-        client_phone = request.form.get('clientPhone', '')
+        form = BookingForm()
+
+        day_ticker = form.day_ticker.data
+        time = form.time.data
+        tutor_id = form.tutor_id.data
+        client_name = form.name.data
+        client_phone = form.phone.data
+
+        # day_ticker = request.form.get('clientWeekday', '')
+        # time = request.form.get('clientTime', '')
+        # profile_id = request.form.get('clientTeacher', 0)
+        # client_name = request.form.get('clientName', '')
+        # client_phone = request.form.get('clientPhone', '')
 
         booking_info = Booking(time=dt.datetime.strptime(time, '%H:%M').time(),
                                day_ticker=day_ticker,
                                client_name=client_name,
                                client_phone=client_phone,
-                               tutor_id=int(profile_id))
+                               tutor_id=int(tutor_id))
 
         # TODO: handle exception
         db_model.session.add(booking_info)

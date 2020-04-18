@@ -24,9 +24,9 @@ according to your demands, book classes or send a request to help in searching.
     | DB_TYPE | no | postgres | Database type. Now SQLite and PostgreSQL are supported. |
     | DB_HOST | no | localhost | A database host. |
     | DB_PORT | no | 5432 | A database port. |
-    | DB_USER | yes (for no SQLite) | user | A database user. Required to be set if it's used no SQLite database. |
-    | DB_PASSWORD | yes (for no SQLite) | password | A database user. Required to be set if it's used no SQLite database. |
-    | DB_NAME | no | tutordb | A database name. If you use SQLite use an absolute or relative path to the database. |
+    | DB_USER | yes (no no SQLite) | user | A database user. Required to be set if it's used no SQLite database. |
+    | DB_PASSWORD | yes (no for SQLite) | password | A database user. Required to be set if it's used no SQLite database. |
+    | DB_NAME | no (yes for SQLite) | tutordb | A database name. If you use SQLite use an absolute or relative path to the database. |
     | SERVER_NAME | no | localhost | An address where the server will be deployed. |
     | SERVER_PORT | no | 5000 | A port that the server will listen. |
     | CSRF_TOKEN| no | random | A CSRF token. |

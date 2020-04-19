@@ -3,29 +3,32 @@
 {% block container %}
   <div class="row mt-5">
     <div class="col-10 col-md-6 offset-1 offset-md-3 mb-3">
-      <form action="{{ url_for('booking_done')}}" class="card mb-3" method="post">
+      <form action="{{ url_for('booking', profile_id=tutor.id, day=day_ticker, time=time) }}" class="card mb-3" method="post">
+        {{ form.csrf_token }}
         <div class="card-body text-center pt-5">
           <img src="{{ tutor.picture }}" class="mb-3" width="95" alt="">
           <h2 class="h5 card-title mt-2 mb-2">{{ tutor.name }}</h2>
           <p class="my-1">Запись на пробный урок</p>
           <p class="my-1">{{ day }}, {{ time }}</p>
         </div>
-        <hr />
+        <hr/>
         <div class="card-body mx-3">
-            <div class="row">
-                <input class="form-control" type="hidden" name="clientWeekday" value="{{ day_ticker }}">
-                <input class="form-control" type="hidden" name="clientTime" value="{{ time }}">
-                <input class="form-control" type="hidden" name="clientTeacher" value="{{ tutor.id }}">
-            </div>
+          <div class="row">
+            {{ form.day_ticker(class="form-control", value=day_ticker) }}
+            {{ form.time(class="form-control", value=time) }}
+            {{ form.tutor_id(class="form-control", value=tutor.id) }}
+          </div>
 
-          <label class="mb-1 mt-2" for="clientName">Вас зовут</label>
-          <input class="form-control" type="text" name="clientName" id="clientName">
+          {% for err in form.name.errors %}
+            <p class="alert-warning">{{ err }}</p>
+          {% endfor %}
+          {{ form.name.label(class="mb-1 mt-2", text="Вас зовут") }}
+          {{ form.name(class="form-control", placeholder="Ваше имя") }}
 
-          <label class="mb-1 mt-2" for="clientPhone">Ваш телефон</label>
-          <input class="form-control" type="tel"  name="clientPhone" id="clientPhone">
+          {{ form.phone.label(class="mb-1 mt-2", text="Ваш телефон") }}
+          {{ form.phone(class="form-control", placeholder="Ваше телефон") }}
 
-          <input type="submit" class="btn btn-primary btn-block mt-4" value="Записаться на пробный урок">
-
+          {{ form.submit(class="btn btn-primary btn-block mt-4") }}
         </div>
       </form>
     </div>

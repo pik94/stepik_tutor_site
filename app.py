@@ -2,13 +2,14 @@ import argparse
 import waitress
 
 from tutor_site import app
+from tutor_site import config as cfg
 
 
 def main(args: argparse.Namespace):
     debug = args.debug
 
-    host = args.host
-    port = args.port
+    host = cfg.SERVER_HOST
+    port = cfg.SERVER_PORT
     if debug:
         app.run(host=host, port=port, debug=debug)
     else:
@@ -26,20 +27,6 @@ if __name__ == '__main__':
                               'waitress as a WSGI server. Otherwise, it will '
                               'be run on default Flask server in a debug '
                               'mode'))
-
-    parser.add_argument('-ho',
-                        '--host',
-                        required=False,
-                        type=str,
-                        default='localhost',
-                        help='Set a host of the server.')
-
-    parser.add_argument('-p',
-                        '--port',
-                        required=False,
-                        type=int,
-                        default=8080,
-                        help='Set a port of the server.')
 
     args = parser.parse_args()
     main(args)

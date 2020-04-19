@@ -1,10 +1,12 @@
-import random
+import datetime as dt
 
 from flask import abort, redirect, render_template, request, url_for
 from flask.views import View
 
 from tutor_site import config as cfg
-from tutor_site.data import data_storage
+from tutor_site.database import db_model
+from tutor_site.database import Booking, Goal, Request, Tutor
+from tutor_site.forms import BookingForm, RequestForm
 
 
 class BasePage(View):
@@ -12,111 +14,118 @@ class BasePage(View):
         self._template_name = template_name
 
 
-class Index(BasePage):
+class IndexPage(BasePage):
     def dispatch_request(self) -> str:
-        profile_ids = random.sample(list(data_storage.data), 6)
-        data = {profile_id: data_storage.data[profile_id]
-                for profile_id in profile_ids}
+        # TODO: handle exceptions
+        rows = db_model.session.query(Tutor).order_by(
+            Tutor.rating.desc()).limit(6).all()
+
+        # profile_ids = random.sample(list(data_storage.data), 6)
+        data = {row.id: row for row in rows}
 
         return render_template(self._template_name, data=dict(data),
                                goals=cfg.GOALS)
 
 
-class Goal(BasePage):
+class GoalPage(BasePage):
     def dispatch_request(self, goal: str) -> str:
         if goal is None or goal not in cfg.GOALS:
             return redirect(url_for('goal', goal='travel'), code=301)
 
-        data = {id_: tutor
-                for id_, tutor in data_storage.data.items()
-                if goal in tutor['goals']}
-        data = sorted(data.items(),
-                      key=lambda item: item[1]['rating'],
-                      reverse=True)
+        # TODO: handle exception
+        goal_obj = db_model.session.query(Goal).filter(
+            Goal.goal == goal).scalar()
 
+        tutors = sorted(goal_obj.tutors, key=lambda tutor: tutor.rating,
+                        reverse=True)
+        data = {tutor.id: tutor for tutor in tutors}
         return render_template(self._template_name, data=dict(data),
                                goal=cfg.GOALS[goal])
 
 
-class Profile(BasePage):
-    def dispatch_request(self, profile_id: str) -> str:
-        profile_id = str(profile_id)
-
-        if profile_id is None or profile_id not in data_storage.data:
-            return redirect(url_for('profile', profile_id='1'))
-
-        return render_template(self._template_name,
-                               tutor=data_storage.data[profile_id],
-                               days=cfg.DAY_MAPPING)
-
-
-class Request(BasePage):
-    def dispatch_request(self) -> str:
-        return render_template(self._template_name, goals=cfg.GOALS)
-
-
-class RequestDone(BasePage):
-    methods = ['POST']
-
-    def dispatch_request(self) -> str:
-        goal = request.form.get('goal', '')
-        time = request.form.get('time', '')
-        name = request.form.get('name', '')
-        phone = request.form.get('phone', '')
-
-        data = {
-            'name':     name,
-            'phone':    phone,
-            'time':     time,
-            'goal':     goal,
-        }
-
-        data_storage.put_request_data(data)
-
-        goal = cfg.GOALS.get(goal, '')
-
-        return render_template('request_done.html',
-                               goal=goal,
-                               time=time,
-                               name=name,
-                               phone=phone)
-
-
-class Booking(BasePage):
-    def dispatch_request(self, profile_id: int, day: str, time: str) -> str:
-        tutor = data_storage.data.get(str(profile_id), {})
+class ProfilePage(BasePage):
+    def dispatch_request(self, profile_id: int) -> str:
+        # TODO: handle exception
+        tutor = db_model.session.query(Tutor).filter(
+            Tutor.id == profile_id).scalar()
         if not tutor:
             abort(404)
 
         return render_template(self._template_name,
                                tutor=tutor,
-                               day_ticker=day,
-                               day=cfg.DAY_MAPPING[day],
-                               time=time)
+                               days=cfg.DAY_MAPPING)
 
 
-class BookingDone(BasePage):
-    methods = ['POST']
+class RequestPage(BasePage):
+    methods = ['GET', 'POST']
 
     def dispatch_request(self) -> str:
-        day_ticker = request.form.get('clientWeekday', '')
-        time = request.form.get('clientTime', '')
-        profile_id = request.form.get('clientTeacher', '')
-        client_name = request.form.get('clientName', '')
-        client_phone = request.form.get('clientPhone', '')
+        form = RequestForm()
+        if request.method == 'GET' or not form.validate_on_submit():
+            return render_template(self._template_name, form=form)
 
-        data = {
-            'profile_id':   profile_id,
-            'time':         time,
-            'day_ticker':   day_ticker,
-            'client_name':  client_name,
-            'client_phone': client_phone,
-        }
+        elif request.method == 'POST':
+            goal = form.goal.data
+            time = form.time.data
+            name = form.name.data
+            phone = form.phone.data
 
-        data_storage.put_booking_data(data)
+            req = Request(name=name, phone=phone, time=time, goal=goal)
+            db_model.session.add(req)
+            # TODO: handle exception
+            db_model.session.commit()
 
-        return render_template(self._template_name,
-                               day=cfg.DAY_MAPPING[day_ticker],
-                               time=time,
-                               client_name=client_name,
-                               client_phone=client_phone)
+            goal = cfg.GOALS.get(goal, '')
+
+            return render_template('request_done.html',
+                                   goal=goal,
+                                   time=time,
+                                   name=name,
+                                   phone=phone)
+
+        else:
+            abort(404)
+
+
+class BookingPage(BasePage):
+    methods = ['GET', 'POST']
+
+    def dispatch_request(self, profile_id: int, day: str, time: str) -> str:
+        form = BookingForm()
+        if request.method == 'GET' or not form.validate_on_submit():
+            tutor = db_model.session.query(Tutor).filter(
+                Tutor.id == profile_id).scalar()
+            if not tutor:
+                abort(404)
+
+            return render_template(self._template_name,
+                                   tutor=tutor,
+                                   day_ticker=day,
+                                   day=cfg.DAY_MAPPING[day],
+                                   time=time,
+                                   form=form)
+
+        elif request.method == 'POST':
+
+            day = form.day_ticker.data
+            time = form.time.data
+            tutor_id = form.tutor_id.data
+            client_name = form.name.data
+            client_phone = form.phone.data
+
+            booking_info = Booking(
+                time=dt.datetime.strptime(time, '%H:%M').time(),
+                day_ticker=day,
+                client_name=client_name,
+                client_phone=client_phone,
+                tutor_id=int(tutor_id))
+
+            # TODO: handle exception
+            db_model.session.add(booking_info)
+            db_model.session.commit()
+
+            return render_template('booking_done.html',
+                                   day=cfg.DAY_MAPPING[day],
+                                   time=time,
+                                   client_name=client_name,
+                                   client_phone=client_phone)

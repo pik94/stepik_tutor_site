@@ -22,25 +22,24 @@ migrate = Migrate(app, db_model)
 
 
 # index page
-app.add_url_rule('/', view_func=IndexPage.as_view(
-    'index', template_name='index.html'))
+app.add_url_rule('/', view_func=IndexPage.as_view('index'))
 
 # goal page
-_goal_view = GoalPage.as_view('goal', template_name='goal.html')
+_goal_view = GoalPage.as_view('goal')
 app.add_url_rule('/goals', view_func=_goal_view, defaults={'goal': None})
 app.add_url_rule('/goals/<string:goal>', view_func=_goal_view)
 
 # profile page
-_profile_view = ProfilePage.as_view('profile', template_name='profile.html')
+_profile_view = ProfilePage.as_view('profile')
 app.add_url_rule('/profiles', view_func=_profile_view,
                  defaults={'profile_id': None})
 app.add_url_rule('/profiles/<int:profile_id>', view_func=_profile_view)
 
 # request page
-_request_view = RequestPage.as_view('request', template_name='request.html')
+_request_view = RequestPage.as_view('request')
 app.add_url_rule('/request', view_func=_request_view)
 
 # booking page
-_booking_view = BookingPage.as_view('booking', template_name='booking.html')
+_booking_view = BookingPage.as_view('booking')
 app.add_url_rule('/booking/<int:profile_id>/<string:day>/<string:time>',
                  view_func=_booking_view)

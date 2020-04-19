@@ -9,12 +9,7 @@ from tutor_site.database import Booking, Goal, Request, Tutor
 from tutor_site.forms import BookingForm, RequestForm
 
 
-class BasePage(View):
-    def __init__(self, template_name: str):
-        self._template_name = template_name
-
-
-class IndexPage(BasePage):
+class IndexPage(View):
     def dispatch_request(self) -> str:
         # TODO: handle exceptions
         rows = db_model.session.query(Tutor).order_by(
@@ -23,11 +18,12 @@ class IndexPage(BasePage):
         # profile_ids = random.sample(list(data_storage.data), 6)
         data = {row.id: row for row in rows}
 
-        return render_template(self._template_name, data=dict(data),
+        return render_template(cfg.TEMPLATES_NAME_MAPPING['index'],
+                               data=dict(data),
                                goals=cfg.GOALS)
 
 
-class GoalPage(BasePage):
+class GoalPage(View):
     def dispatch_request(self, goal: str) -> str:
         if goal is None or goal not in cfg.GOALS:
             return redirect(url_for('goal', goal='travel'), code=301)
@@ -39,11 +35,12 @@ class GoalPage(BasePage):
         tutors = sorted(goal_obj.tutors, key=lambda tutor: tutor.rating,
                         reverse=True)
         data = {tutor.id: tutor for tutor in tutors}
-        return render_template(self._template_name, data=dict(data),
+        return render_template(cfg.TEMPLATES_NAME_MAPPING['goals'],
+                               data=dict(data),
                                goal=cfg.GOALS[goal])
 
 
-class ProfilePage(BasePage):
+class ProfilePage(View):
     def dispatch_request(self, profile_id: int) -> str:
         # TODO: handle exception
         tutor = db_model.session.query(Tutor).filter(
@@ -51,18 +48,19 @@ class ProfilePage(BasePage):
         if not tutor:
             abort(404)
 
-        return render_template(self._template_name,
+        return render_template(cfg.TEMPLATES_NAME_MAPPING['profile'],
                                tutor=tutor,
                                days=cfg.DAY_MAPPING)
 
 
-class RequestPage(BasePage):
+class RequestPage(View):
     methods = ['GET', 'POST']
 
     def dispatch_request(self) -> str:
         form = RequestForm()
         if request.method == 'GET' or not form.validate_on_submit():
-            return render_template(self._template_name, form=form)
+            return render_template(cfg.TEMPLATES_NAME_MAPPING['request'],
+                                   form=form)
 
         elif request.method == 'POST':
             goal = form.goal.data
@@ -77,7 +75,8 @@ class RequestPage(BasePage):
 
             goal = cfg.GOALS.get(goal, '')
 
-            return render_template('request_done.html',
+            return render_template(cfg.TEMPLATES_NAME_MAPPING[
+                                       'request_success'],
                                    goal=goal,
                                    time=time,
                                    name=name,
@@ -87,7 +86,7 @@ class RequestPage(BasePage):
             abort(404)
 
 
-class BookingPage(BasePage):
+class BookingPage(View):
     methods = ['GET', 'POST']
 
     def dispatch_request(self, profile_id: int, day: str, time: str) -> str:
@@ -98,7 +97,7 @@ class BookingPage(BasePage):
             if not tutor:
                 abort(404)
 
-            return render_template(self._template_name,
+            return render_template(cfg.TEMPLATES_NAME_MAPPING['booking'],
                                    tutor=tutor,
                                    day_ticker=day,
                                    day=cfg.DAY_MAPPING[day],
@@ -106,7 +105,6 @@ class BookingPage(BasePage):
                                    form=form)
 
         elif request.method == 'POST':
-
             day = form.day_ticker.data
             time = form.time.data
             tutor_id = form.tutor_id.data
@@ -124,8 +122,12 @@ class BookingPage(BasePage):
             db_model.session.add(booking_info)
             db_model.session.commit()
 
-            return render_template('booking_done.html',
+            return render_template(cfg.TEMPLATES_NAME_MAPPING[
+                                       'booking_success'],
                                    day=cfg.DAY_MAPPING[day],
                                    time=time,
                                    client_name=client_name,
                                    client_phone=client_phone)
+
+        else:
+            abort(404)

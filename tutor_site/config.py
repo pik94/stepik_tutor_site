@@ -19,6 +19,18 @@ DAY_MAPPING = {
     'sun': 'Воскресенье'
 }
 
+
+TEMPLATES_NAME_MAPPING = {
+    'index':            'index.html',
+    'goals':            'goal.html',
+    'request':          'request.html',
+    'request_success':  'request_done.html',
+    'profile':          'profile.html',
+    'booking':          'booking.html',
+    'booking_success':  'booking_done.html'
+}
+
+
 # Database credentials
 DB_TYPE = 'postgresql'
 DB_TYPE = os.environ.get('DB_TYPE', DB_TYPE)

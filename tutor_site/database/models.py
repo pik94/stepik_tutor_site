@@ -20,7 +20,7 @@ class Tutor(db.Model):
 
     goals = db.relationship('Goal', secondary=tutors_goals_association,
                             back_populates='tutors')
-    booking = db.relationship('Booking')
+    booking = db.relationship('Booking', back_populates='tutor')
 
 
 class Goal(db.Model):
@@ -42,7 +42,7 @@ class Booking(db.Model):
     client_name = db.Column(db.Text, nullable=False)
     client_phone = db.Column(db.Text, nullable=False)
     tutor_id = db.Column(db.Integer, db.ForeignKey('tutors.id'))
-    tutor = db.relationship('Tutor')
+    tutor = db.relationship('Tutor', back_populates='booking')
 
 
 class Request(db.Model):
